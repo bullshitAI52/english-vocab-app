@@ -76,11 +76,11 @@
 
             wordlists: {
                 async list() {
-                    const result = await API.request('/collections/wordlists/records?perPage=500');
+                    const result = await API.request('/collections/en_wordlists/records?perPage=500');
                     return { files: (result.items || []).map(function(item) { return { name: item.name, filename: item.filename }; }) };
                 },
                 async getContent(filename) {
-                    const result = await API.request('/collections/wordlists/records?perPage=500');
+                    const result = await API.request('/collections/en_wordlists/records?perPage=500');
                     const items = result.items || [];
                     for (var i = 0; i < items.length; i++) {
                         if (items[i].filename === filename || items[i].name === filename) {
@@ -92,17 +92,17 @@
                 async upload(formData) {
                     const file = formData.get('file');
                     const text = await file.text();
-                    return await API.request('/collections/wordlists/records', {
+                    return await API.request('/collections/en_wordlists/records', {
                         method: 'POST',
                         body: JSON.stringify({ name: file.name, filename: file.name, content: text })
                     });
                 },
                 async deleteFile(filename) {
-                    const result = await API.request('/collections/wordlists/records?perPage=500');
+                    const result = await API.request('/collections/en_wordlists/records?perPage=500');
                     const items = result.items || [];
                     for (var i = 0; i < items.length; i++) {
                         if (items[i].filename === filename || items[i].name === filename) {
-                            return await API.request('/collections/wordlists/records/' + items[i].id, { method: 'DELETE' });
+                            return await API.request('/collections/en_wordlists/records/' + items[i].id, { method: 'DELETE' });
                         }
                     }
                     throw new Error('File not found');
@@ -112,7 +112,7 @@
             progress: {
                 async get() {
                     try {
-                        const result = await API.request('/collections/progress/records?filter=(user="' + currentUser.id + '")&perPage=1');
+                        const result = await API.request('/collections/en_progress/records?filter=(user="' + currentUser.id + '")&perPage=1');
                         const progress = (result.items && result.items.length > 0) ? {
                             last_file: result.items[0].last_file,
                             last_content: result.items[0].last_content,
@@ -123,14 +123,14 @@
                 },
                 async update(data) {
                     try {
-                        const result = await API.request('/collections/progress/records?filter=(user="' + currentUser.id + '")&perPage=1');
+                        const result = await API.request('/collections/en_progress/records?filter=(user="' + currentUser.id + '")&perPage=1');
                         if (result.items && result.items.length > 0) {
-                            return await API.request('/collections/progress/records/' + result.items[0].id, {
+                            return await API.request('/collections/en_progress/records/' + result.items[0].id, {
                                 method: 'PATCH',
                                 body: JSON.stringify(data)
                             });
                         } else {
-                            return await API.request('/collections/progress/records', {
+                            return await API.request('/collections/en_progress/records', {
                                 method: 'POST',
                                 body: JSON.stringify({ user: currentUser.id, last_file: data.last_file || '', last_page: data.last_page || 1 })
                             });
@@ -142,7 +142,7 @@
             stats: {
                 async getAll() {
                     try {
-                        const result = await API.request('/collections/word_stats/records?filter=(user="' + currentUser.id + '")&perPage=10000');
+                        const result = await API.request('/collections/en_word_stats/records?filter=(user="' + currentUser.id + '")&perPage=10000');
                         return { stats: (result.items || []).map(function(item) {
                             return { word: item.word, correct: item.correct || 0, wrong: item.wrong || 0, last_practiced: item.last_practiced || '' };
                         })};
@@ -151,14 +151,14 @@
                 async update(word, correct, wrong, last_practiced) {
                     try {
                         const filter = '(user="' + currentUser.id + '"&&word="' + encodeURIComponent(word) + '")';
-                        const result = await API.request('/collections/word_stats/records?filter=' + filter + '&perPage=1');
+                        const result = await API.request('/collections/en_word_stats/records?filter=' + filter + '&perPage=1');
                         const body = { word: word, correct: correct, wrong: wrong, last_practiced: String(last_practiced) };
                         if (result.items && result.items.length > 0) {
-                            return await API.request('/collections/word_stats/records/' + result.items[0].id, {
+                            return await API.request('/collections/en_word_stats/records/' + result.items[0].id, {
                                 method: 'PATCH', body: JSON.stringify(body)
                             });
                         } else {
-                            return await API.request('/collections/word_stats/records', {
+                            return await API.request('/collections/en_word_stats/records', {
                                 method: 'POST', body: JSON.stringify({ user: currentUser.id, word: word, correct: correct, wrong: wrong, last_practiced: String(last_practiced) })
                             });
                         }
@@ -167,7 +167,7 @@
                 async daily() {
                     try {
                         const today = new Date().toISOString().slice(0, 10);
-                        const result = await API.request('/collections/daily_stats/records?filter=(user="' + currentUser.id + '"&&date="' + today + '")&perPage=1');
+                        const result = await API.request('/collections/en_daily_stats/records?filter=(user="' + currentUser.id + '"&&date="' + today + '")&perPage=1');
                         return { daily: (result.items || []).map(function(d) {
                             return { date: d.date, words_practiced: d.words_practiced || 0, correct_count: d.correct_count || 0, wrong_count: d.wrong_count || 0 };
                         })};
@@ -176,15 +176,15 @@
                 async saveDaily(correct, wrong) {
                     try {
                         const today = new Date().toISOString().slice(0, 10);
-                        const result = await API.request('/collections/daily_stats/records?filter=(user="' + currentUser.id + '"&&date="' + today + '")&perPage=1');
+                        const result = await API.request('/collections/en_daily_stats/records?filter=(user="' + currentUser.id + '"&&date="' + today + '")&perPage=1');
                         if (result.items && result.items.length > 0) {
                             const d = result.items[0];
-                            return await API.request('/collections/daily_stats/records/' + d.id, {
+                            return await API.request('/collections/en_daily_stats/records/' + d.id, {
                                 method: 'PATCH',
                                 body: JSON.stringify({ words_practiced: (d.words_practiced || 0) + correct + wrong, correct_count: (d.correct_count || 0) + correct, wrong_count: (d.wrong_count || 0) + wrong })
                             });
                         } else {
-                            return await API.request('/collections/daily_stats/records', {
+                            return await API.request('/collections/en_daily_stats/records', {
                                 method: 'POST',
                                 body: JSON.stringify({ user: currentUser.id, date: today, words_practiced: correct + wrong, correct_count: correct, wrong_count: wrong })
                             });
